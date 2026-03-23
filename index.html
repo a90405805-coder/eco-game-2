@@ -7,7 +7,7 @@
     
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2e7d32">
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="apple-touch-icon" href="./icon.png">
 
     <style>
         :root {
@@ -27,38 +27,44 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding-bottom: 30px;
         }
 
         .header-info {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
+        /* 字體放大 50% */
+        h1 { font-size: 3em; margin: 10px 0; color: #1b5e20; }
+        .instruction-text { font-size: 1.5em; font-weight: bold; margin: 5px 0 15px 0; }
+        
         #timer-display {
-            font-size: 2em;
+            font-size: 3em; /* 放大 50% */
             font-weight: bold;
             color: #d32f2f;
             background: white;
-            padding: 5px 20px;
+            padding: 10px 30px;
             border-radius: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin: 10px 0;
             transition: color 0.3s;
+            display: inline-block;
         }
 
         .game-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(2, 1fr);
-            gap: 12px;
+            gap: 15px;
             width: 95%;
-            max-width: 1000px;
+            max-width: 1200px;
             perspective: 1000px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .card {
-            height: 220px;
+            height: 320px; /* 為了容納更大字體，加高卡牌 */
             cursor: pointer;
             position: relative;
             transform-style: preserve-3d;
@@ -75,15 +81,15 @@
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: 15px;
             box-sizing: border-box;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .card-back {
             background-color: var(--card-back);
             color: white;
-            font-size: 2.5em;
+            font-size: 4em; /* 牌背數字放大 */
             justify-content: center;
             align-items: center;
         }
@@ -95,29 +101,32 @@
         }
 
         .question-text {
-            font-size: 0.95em;
+            font-size: 1.45em; /* 題目放大 50% */
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             color: #1b5e20;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 5px;
+            border-bottom: 3px solid #ddd;
+            padding-bottom: 8px;
+            line-height: 1.3;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
             width: 100%;
         }
 
         .option {
             background-color: #f5f5f5;
-            padding: 8px 10px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 1.35em; /* 選項放大 50% */
+            font-weight: bold;
+            border: 2px solid #ddd;
             cursor: pointer;
             transition: background-color 0.2s;
+            line-height: 1.2;
         }
         
         .option:hover { background-color: #e0e0e0; }
@@ -125,24 +134,65 @@
         .option.wrong { background-color: var(--wrong-color) !important; color: white; border-color: var(--wrong-color); }
 
         #restart-btn {
-            padding: 12px 40px;
-            font-size: 1.1em;
+            padding: 15px 50px;
+            font-size: 1.65em; /* 按鈕放大 50% */
+            font-weight: bold;
             background-color: #2e7d32;
             color: white;
             border: none;
-            border-radius: 30px;
+            border-radius: 40px;
             cursor: pointer;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             transition: background-color 0.3s, transform 0.1s;
         }
 
         #restart-btn:hover { background-color: #1b5e20; }
         #restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        @media (max-width: 800px) {
-            .game-container { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
-            .card { height: 190px; }
+        /* 客製化彈出視窗 (Modal) 樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s;
+        }
+        .modal-overlay.show { visibility: visible; opacity: 1; }
+        
+        .modal-content {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            max-width: 80%;
+        }
+
+        .modal-message {
+            font-size: 2.5em; /* 彈出視窗文字放大 */
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .modal-btn {
+            padding: 15px 40px;
+            font-size: 1.5em;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+
+        /* 響應式：確保橫向小螢幕也能滾動查看 */
+        @media (max-width: 900px) {
+            h1 { font-size: 2.5em; }
+            .card { height: 280px; }
+            .question-text { font-size: 1.3em; }
+            .option { font-size: 1.2em; padding: 10px; }
         }
     </style>
 </head>
@@ -150,24 +200,30 @@
 
     <div class="header-info">
         <h1>環教翻牌 2 號</h1>
+        <div class="instruction-text">任選一張牌翻開，計時開始！</div>
         <div id="timer-display">時間：10</div>
-        <p>任選一張牌翻開，計時開始！</p>
     </div>
 
     <div class="game-container" id="game-board"></div>
     <button id="restart-btn">重新開始</button>
 
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-text" class="modal-message">訊息</div>
+            <button class="modal-btn" onclick="closeModal()">確認</button>
+        </div>
+    </div>
+
     <script>
-        // --- 註冊 Service Worker (PWA 離線核心) ---
+        // 註冊 Service Worker (PWA)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker 註冊成功！'))
+                    .then(() => console.log('Service Worker 註冊成功！'))
                     .catch(err => console.log('Service Worker 註冊失敗：', err));
             });
         }
 
-        // --- 遊戲邏輯 ---
         const qaData = [
             { q: "下列哪一項是綠色消費行為:", o: ["1.買環保標章產品", "2.買CAS產品", "3.買進口商品"], a: 1 },
             { q: "下列哪一項是符合綠色旅遊行為:", o: ["1.入住環表標章旅館", "2.選擇頂級米其林三星餐廳", "3.一個人開車出遊"], a: 1 },
@@ -186,14 +242,26 @@
 
         const board = document.getElementById('game-board');
         const timerText = document.getElementById('timer-display');
+        const modal = document.getElementById('custom-modal');
+        const modalText = document.getElementById('modal-text');
 
         function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+        // 控制客製化視窗
+        function showModal(message, isSuccess) {
+            modalText.innerText = message;
+            modalText.style.color = isSuccess ? "#2e7d32" : "#d32f2f";
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+        }
 
         function startTimer() {
             if (gameStarted) return;
             gameStarted = true;
             
-            // 鎖定其他未翻開的牌
             document.querySelectorAll('.card:not(.flipped)').forEach(c => c.style.pointerEvents = 'none');
 
             timerInterval = setInterval(() => {
@@ -212,10 +280,10 @@
             
             if (isWin) {
                 timerText.style.color = "#4caf50";
-                alert("挑戰成功，您是綠色生活達人！");
+                showModal("挑戰成功，您是綠色生活達人！", true);
             } else {
                 timerText.style.color = "gray";
-                alert("挑戰失敗，再接再厲！");
+                showModal("挑戰失敗，再接再厲！", false);
             }
             
             document.querySelectorAll('.card').forEach(c => c.style.pointerEvents = 'none');
@@ -238,10 +306,11 @@
             setTimeout(() => {
                 if (selected === correct) endGame(true);
                 else endGame(false);
-            }, 300);
+            }, 400); // 稍微延長一點點時間讓長輩看清楚顏色變化
         }
 
         function init() {
+            closeModal(); // 確保重新開始時視窗是關閉的
             clearInterval(timerInterval);
             board.innerHTML = '';
             timeLeft = 10;
